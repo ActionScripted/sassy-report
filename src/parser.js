@@ -45,11 +45,17 @@ async function parse(sass_root, css_tmp) {
     types     : [],
   };
 
-  await fs.promises.mkdir(
-    path.dirname(css_tmp),
-    {recursive: true}
-  );
+  // Create tmp dir, as needed
+  try {
+    await fs.promises.mkdir(
+      path.dirname(css_tmp),
+      {recursive: true}
+    );
+  } catch(error) {
+    /* Likely exists, all good */
+  }
 
+  // Process SASS files
   await fs.promises.readdir(sass_root).then(async (files) => {
     await asyncForEach(files, async (file) => {
       if (file.endsWith('.scss')) {
@@ -58,14 +64,26 @@ async function parse(sass_root, css_tmp) {
 
         report.files.push(sass_file);
 
-        // TODO: I don't like this syntax/structure
-        report.selectors = report.selectors.concat(sass_data.selectors);
-        report.ids = report.ids.concat(sass_data.simpleSelectors.ids);
-        report.classes = report.classes.concat(sass_data.simpleSelectors.classes);
-        report.types = report.types.concat(sass_data.simpleSelectors.types);
+        if (Object.keys(sass_data).length) {
+          // TODO: I don't like this syntax/structure
+          report.selectors = report.selectors.concat(sass_data.selectors);
+          report.ids = report.ids.concat(sass_data.simpleSelectors.ids);
+          report.classes = report.classes.concat(sass_data.simpleSelectors.classes);
+          report.types = report.types.concat(sass_data.simpleSelectors.types);
+        }
       }
     });
   });
+
+  // Remove tmp file
+  await fs.promises.unlink(css_tmp);
+
+  // (Maybe) Remove tmp dir
+  try {
+    await fs.promises.rmdir(path.dirname(css_tmp));
+  } catch(error) {
+    /* Dir probably not empty, it's cool */
+  }
 
   return report;
 }
