@@ -1,0 +1,25 @@
+{
+  "name": "sassy-reporter",
+  "version": "1.0.0",
+  "description": "Traverse (webpack-friendly) SASS and generate a style report.",
+  "main": "index.js",
+  "author": "Michael Thompson",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "start": "node index.js",
+    "test": "node test.js"
+  },
+  "dependencies": {
+    "async": "^2.6.2",
+    "comment-parser": "^0.5.4",
+    "css-selector-extract": "^4.0.0",
+    "ejs": "^2.6.1",
+    "json-formatter-js": "^2.2.1",
+    "json-string-formatter": "^1.0.1",
+    "list-selectors": "^2.0.0",
+    "node-sass": "^4.11.0",
+    "postcss-selector-parser": "^6.0.2",
+    "sass-extract": "^2.1.0"
+  }
+}

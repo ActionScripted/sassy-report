@@ -1,0 +1,10 @@
+# System / Dev / Env
+.DS_Store
+.tern-port
+/test/public
+/test/src
+node_modules
+
+# Project
+.sassy_report.*.css.tmp
+sassy_report.*.html
