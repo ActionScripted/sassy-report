@@ -36,6 +36,10 @@ yarn start <SASS directory>
 yarn test
 ```
 
+# Future
+
+Reevaluate (life and) the use of all the async/await/promise shenanigans.
+
 # License
 
 [GNU General Public License v3.0](https://github.com/ActionScripted/sassy-report/blob/master/LICENSE)

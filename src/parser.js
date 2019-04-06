@@ -8,82 +8,102 @@ const listSelectors = require('list-selectors');
 const parser = require('postcss-selector-parser');
 const path = require('path');
 const sass = require('node-sass');
-const util = require('util');
+const sassExtract = require('sass-extract');
+
+const utils = require('./utils');
 
 
-async function asyncForEach(array, callback) {
-  for (let index = 0; index < array.length; index++) {
-    await callback(array[index], index, array);
-  }
-}
+async function getReportCSS(sass_file, tmp_file) {
+  return await (() => { return new Promise(resolve => {
+    sass.render({ file: sass_file }, async (err, sass_result) => {
 
-async function process(sass_file, css_tmp) {
-  const sass_render = sass.renderSync({ file: sass_file })
+      try {
+        await fs.promises.unlink(tmp_file);
+      } catch (err) { /* */ }
 
-  if (fs.existsSync(css_tmp)) {
-    fs.unlink(css_tmp, (err) => {});
-  }
+      try {
+        await fs.promises.writeFile(tmp_file, sass_result.css);
+      } catch (err) { /* */ }
 
-  fs.writeFile(css_tmp, sass_render.css, (err) => {});
-
-  function getSelectors() {
-    return new Promise((resolve, reject) => {
-      listSelectors([css_tmp], data => { resolve(data); });
+      listSelectors([tmp_file], data => { resolve(data); });
     });
-  }
-
-  return await getSelectors();
+  })})();
 }
 
 
-async function parse(sass_root, css_tmp) {
+async function getReportSASS(sass_file, tmp_file) {
+  return await (() => { return new Promise(resolve => {
+    sassExtract.render({ file: sass_file })
+      .then((data) => { resolve(data); });
+  })})();
+}
+
+
+function processCSSData(report, data) {
+  report.css_classes = report.css_classes.concat(data.simpleSelectors.classes);
+  report.css_ids = report.css_ids.concat(data.simpleSelectors.ids);
+  report.css_selectors = report.css_selectors.concat(data.selectors);
+  report.css_types = report.css_types.concat(data.simpleSelectors.types);
+
+  return report;
+}
+
+function processSASSData(report, data) {
+  //report.sass_css = report.sass_vars.concat(data.css);
+  //report.sass_map = report.sass_vars.concat(data.map);
+  report.sass_files.push(...data.stats.includedFiles);
+  report.sass_stats = report.sass_vars.concat(data.stats);
+  report.sass_vars = report.sass_vars.concat(data.vars);
+
+  return report;
+}
+
+
+async function parse(sass_root, tmp_file) {
   let report = {
-    classes   : [],
-    files     : [],
-    ids       : [],
-    selectors : [],
-    types     : [],
+    css_classes   : [],
+    css_ids       : [],
+    css_selectors : [],
+    css_types     : [],
+    css_raw       : [],
+    sass_files    : [],
+    sass_vars     : [],
   };
 
   // Create tmp dir, as needed
   try {
-    await fs.promises.mkdir(
-      path.dirname(css_tmp),
-      {recursive: true}
-    );
-  } catch(error) {
-    /* Likely exists, all good */
-  }
+    await fs.promises.mkdir(path.dirname(tmp_file), {recursive: true});
+  } catch (err) { /* */ }
 
   // Process SASS files
   await fs.promises.readdir(sass_root).then(async (files) => {
-    await asyncForEach(files, async (file) => {
+    await utils.asyncForEach(files, async (file) => {
       if (file.endsWith('.scss')) {
         const sass_file = path.join(sass_root, file);
-        const sass_data = await process(sass_file, css_tmp);
 
-        report.files.push(sass_file);
+        const css_data  = await getReportCSS(sass_file, tmp_file);
+        const sass_data = await getReportSASS(sass_file, tmp_file);
+
+        if (Object.keys(css_data).length) {
+          report = processCSSData(report, css_data);
+        }
 
         if (Object.keys(sass_data).length) {
-          // TODO: I don't like this syntax/structure
-          report.selectors = report.selectors.concat(sass_data.selectors);
-          report.ids = report.ids.concat(sass_data.simpleSelectors.ids);
-          report.classes = report.classes.concat(sass_data.simpleSelectors.classes);
-          report.types = report.types.concat(sass_data.simpleSelectors.types);
+          report = processSASSData(report, sass_data);
         }
       }
     });
   });
 
   // Remove tmp file
-  await fs.promises.unlink(css_tmp);
+  try {
+    await fs.promises.unlink(tmp_file);
+  } catch (err) { /* */ }
 
   // (Maybe) Remove tmp dir
   try {
-    await fs.promises.rmdir(path.dirname(css_tmp));
-  } catch(error) {
-    /* Dir probably not empty, it's cool */
-  }
+    await fs.promises.rmdir(path.dirname(tmp_file));
+  } catch (err) { /* */ }
 
   return report;
 }

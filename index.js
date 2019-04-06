@@ -18,7 +18,7 @@ async function main() {
   const data = await parser.parse(sass_dir, parser_tmp);
 
   renderer.render(
-    './src/views/index.ejs',
+    './src/templates/report.ejs',
     RENDER_FILE_OUT.replace('[id]', id),
     {report: data},
     RENDER_OPTS

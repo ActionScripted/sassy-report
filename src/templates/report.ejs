@@ -57,10 +57,10 @@
       <section class="section-block">
         <% if (report) { %>
 
-          <p>Files:</p>
-          <% if (report.files.length) { %>
+          <p>SASS Files:</p>
+          <% if (report.sass_files.length) { %>
             <ul>
-              <% report.files.forEach(function(file) { %>
+              <% report.sass_files.forEach(function(file) { %>
                 <li><%= file %></li>
               <% }) %>
             </ul>
@@ -68,10 +68,10 @@
             <p><em>No files.</em></p>
           <% } %>
 
-          <p>Tags:</p>
-          <% if (report.types.length) { %>
+          <p>CSS Tags:</p>
+          <% if (report.css_types.length) { %>
             <ul>
-              <% report.types.forEach(function(css_type) { %>
+              <% report.css_types.forEach(function(css_type) { %>
                 <li><%= css_type %></li>
               <% }) %>
             </ul>
@@ -79,10 +79,10 @@
             <p><em>No tags.</em></p>
           <% } %>
 
-          <p>IDs:</p>
-          <% if (report.ids.length) { %>
+          <p>CSS IDs:</p>
+          <% if (report.css_ids.length) { %>
             <ul>
-              <% report.ids.forEach(function(css_id) { %>
+              <% report.css_ids.forEach(function(css_id) { %>
                 <li><%= css_id %></li>
               <% }) %>
             </ul>
@@ -90,11 +90,11 @@
             <p><em>No IDs.</em></p>
           <% } %>
 
-          <p>Classes:</p>
+          <p>CSS Classes:</p>
           <p>TODO: expand to show ALL uses in selectors.</p>
-          <% if (report.classes.length) { %>
+          <% if (report.css_classes.length) { %>
             <ul>
-              <% report.classes.forEach(function(css_class) { %>
+              <% report.css_classes.forEach(function(css_class) { %>
                 <li><%= css_class %></li>
               <% }) %>
             </ul>
@@ -102,15 +102,26 @@
             <p><em>No classes.</em></p>
           <% } %>
 
-          <p>Selectors:</p>
-          <% if (report.selectors.length) { %>
+          <p>CSS Selectors:</p>
+          <% if (report.css_selectors.length) { %>
             <ul>
-              <% report.selectors.forEach(function(css_selector) { %>
+              <% report.css_selectors.forEach(function(css_selector) { %>
                 <li><%= css_selector %></li>
               <% }) %>
             </ul>
           <% } else { %>
             <p><em>No selectors.</em></p>
+          <% } %>
+
+          <p>SASS Variables:</p>
+          <% if (report.sass_vars.length) { %>
+            <ul>
+              <% report.sass_vars.forEach(function(sass_var) { %>
+                <li><%= sass_var %></li>
+              <% }) %>
+            </ul>
+          <% } else { %>
+            <p><em>No SASS variables.</em></p>
           <% } %>
 
         <% } else { %>
