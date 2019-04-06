@@ -2,6 +2,8 @@
 
 Generates SASS reports for your projects. Collects information on elements, classes, comments and IDs and analyzes coverage and usage. Works with existing SASS, annotations and doc strings not required (but supported!).
 
+[ TODO: report screenshot ]
+
 # Installation
 
 TODO: make this work
