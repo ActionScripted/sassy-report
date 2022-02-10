@@ -18,7 +18,7 @@
     "json-formatter-js": "^2.2.1",
     "json-string-formatter": "^1.0.1",
     "list-selectors": "^2.0.0",
-    "node-sass": "^4.11.0",
+    "node-sass": "^7.0.0",
     "postcss-selector-parser": "^6.0.2",
     "sass-extract": "^2.1.0"
   }
